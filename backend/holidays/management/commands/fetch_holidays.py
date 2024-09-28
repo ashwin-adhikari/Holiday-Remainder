@@ -49,7 +49,10 @@ class Command(BaseCommand):
                     events = date_data.get("events", [])
                     if events:
                         for event in events:
-                            print(f"Event on this day: {event.get('strEn')}/{event.get('strNp')}")
+                            if is_holiday:
+                                print(f"Event on this day: {event.get('strEn')}/{event.get('strNp')}")
+                            else:
+                                break
                     else:
                         pass
 

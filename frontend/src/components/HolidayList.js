@@ -23,13 +23,13 @@ const Holidays = () => {
     return (
         <div>
             <h1>Holidays</h1>
-            <ul>
+            <ol>
                 {holidays.map(holiday => (
                     <li key={holiday.id}>
                         {holiday.bs_day}/{holiday.bs_month}/{holiday.bs_year} - {holiday.is_holiday ? "Holiday" : "Not a Holiday"}
                     </li>
                 ))}
-            </ul>
+            </ol>
         </div>
     );
 };
