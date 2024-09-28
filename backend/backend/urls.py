@@ -1,7 +1,8 @@
 
 from django.urls import path
-from holidays.views import holiday_list
+from holidays.views import HolidayList,EventList
 
 urlpatterns = [
-     path('holidays/', holiday_list),
+     path('holidays/', HolidayList.as_view()),
+     path('events/', EventList.as_view()),
 ]

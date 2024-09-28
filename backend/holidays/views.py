@@ -1,6 +1,13 @@
 from django.http import JsonResponse
-from holidays.models import Holiday
+from holidays.models import Holiday, Event
+from .serializers import EventSerializer,HolidaySerializer
+from rest_framework import generics
 
-def holiday_list(request):
-    holidays = Holiday.objects.all().values()
-    return JsonResponse(list(holidays),safe=False)
+
+class EventList(generics.ListAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+
+class HolidayList(generics.ListAPIView):
+    queryset = Holiday.objects.all()
+    serializer_class = HolidaySerializer

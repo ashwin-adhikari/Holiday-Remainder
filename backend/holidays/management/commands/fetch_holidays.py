@@ -16,9 +16,12 @@ class Command(BaseCommand):
                 bsDay
                 bsMonth
                 bsYear
+                bsMonthStrEn
+                bsMonthStrNp
                 isHoliday
                 events {
                     strNp
+                    strEn
                     isHoliday
                 }
             }
@@ -27,11 +30,11 @@ class Command(BaseCommand):
 
         response = requests.post(api_url, json={"query": query})
         print("API Response Status Code:", response.status_code)
-        print("API Response Text:", response.text)
+        data = response.json()
+        print(data)
 
         if response.status_code == 200:
             response_data = response.json()
-            print("Parsed Response JSON:", response_data)
 
             data = response_data.get("data", {}).get("dates", [])
 
@@ -42,21 +45,31 @@ class Command(BaseCommand):
             for date_data in data:
                 is_holiday = date_data.get("isHoliday", False)
                 if is_holiday:
-                    print(
-                        f"Holiday found on {date_data['bsDay']}/{date_data['bsMonth']}/{date_data['bsYear']}"
-                    )
+                    print(f"Holiday on {date_data['bsDay']}/{date_data['bsMonth']}/{date_data['bsYear']}")
+                    events = date_data.get("events", [])
+                    if events:
+                        for event in events:
+                            print(f"Event on this day: {event.get('strEn')}/{event.get('strNp')}")
+                    else:
+                        pass
+
 
                     holiday = Holiday.objects.create(
                         bs_day=date_data["bsDay"],
                         bs_month=date_data["bsMonth"],
                         bs_year=date_data["bsYear"],
+                        bs_month_en=date_data["bsMonthStrEn"],
+                        bs_month_np=date_data["bsMonthStrNp"],
                         is_holiday=is_holiday,
                     )
                     events = date_data.get("events", [])
                     for event in events:
+                        event_en=event.get("strEn","Unknown")
+                        event_np=event.get("strNp","Unknown")
                         Event.objects.create(
                             holiday=holiday,
-                            event_np=event["strNp"],
+                            event_en=event_en,
+                            event_np=event_np,
                             is_holiday=event["isHoliday"],
                         )
             self.stdout.write(
