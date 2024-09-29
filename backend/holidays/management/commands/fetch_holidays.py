@@ -30,8 +30,7 @@ class Command(BaseCommand):
 
         response = requests.post(api_url, json={"query": query})
         print("API Response Status Code:", response.status_code)
-        data = response.json()
-        print(data)
+       
 
         if response.status_code == 200:
             response_data = response.json()
@@ -51,10 +50,6 @@ class Command(BaseCommand):
                         for event in events:
                             if is_holiday:
                                 print(f"Event on this day: {event.get('strEn')}/{event.get('strNp')}")
-                            else:
-                                break
-                    else:
-                        pass
 
 
                     holiday = Holiday.objects.create(
@@ -69,7 +64,7 @@ class Command(BaseCommand):
                     for event in events:
                         event_en=event.get("strEn","Unknown")
                         event_np=event.get("strNp","Unknown")
-                        Event.objects.create(
+                        Event.objects.get_or_create(
                             holiday=holiday,
                             event_en=event_en,
                             event_np=event_np,

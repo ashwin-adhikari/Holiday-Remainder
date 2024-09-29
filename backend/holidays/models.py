@@ -10,14 +10,15 @@ class Holiday(models.Model):
     is_holiday = models.BooleanField(default=False)
     bs_month_np = models.CharField(max_length=50)
 
+    
     def __str__(self):
-        return f"{self.bs_day}/{self.bs_month}/{self.bs_year} {self.bs_month_en} , {self.bs_year}"
+        return f"{self.bs_day}/{self.bs_month}/{self.bs_year}"
 
 class Event(models.Model):
     holiday = models.ForeignKey(Holiday, related_name='events', on_delete=models.CASCADE)
     event_np = models.CharField(max_length=255, null=True, blank=True)
     is_holiday = models.BooleanField(default=False)
-    event_en = models.CharField(max_length=255,  null=True, blank=True)
+    event_en = models.CharField(max_length=255, null=True, blank=True )
 
     def __str__(self):
         return self.event_en

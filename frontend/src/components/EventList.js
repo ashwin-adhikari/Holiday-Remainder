@@ -22,13 +22,12 @@ const Events = () => {
         fetchEvents();
     }, []);
 
-   
-
+    
     return (
         <div>
             <h1>Events:</h1>
             <ol>
-                {events.filter(event=> event.is_holiday && event.event_en).map(event=>(
+                {events.filter(event=> event.is_holiday && event.event_np).map(event=>(
                     <li key={event.id}>
                         {event.event_np}/{event.event_en} - Event
                     </li>

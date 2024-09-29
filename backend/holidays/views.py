@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+
 from holidays.models import Holiday, Event
 from .serializers import EventSerializer,HolidaySerializer
 from rest_framework import generics

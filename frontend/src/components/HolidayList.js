@@ -1,37 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const Holidays = () => {
+function HolidayList() {
+    // Declare state to store holidays and events
     const [holidays, setHolidays] = useState([]);
+    const [loading, setLoading] = useState(true);
 
+    // Function to fetch holiday data from the backend
+    const fetchHolidays = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/holidays/'); // Assuming your API endpoint is '/api/holidays'
+            const data = await response.json();
+            setHolidays(data);  // Update holidays state
+        } catch (error) {
+            console.error('Error fetching holidays:', error);
+        } finally {
+            setLoading(false);  // Stop loading indicator once data is fetched
+        }
+    };
+
+    // Use useEffect to fetch holidays when the component mounts
     useEffect(() => {
-        const fetchHolidays = async () => {
-            try {
-                const response = await fetch('http://127.0.0.1:8000/holidays/');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setHolidays(data);
-            } catch (error) {
-                console.error('Error fetching holidays:', error);
-            }
-        };
-
         fetchHolidays();
     }, []);
 
+    // Handle duplication prevention (if necessary, depending on data structure)
+    const uniqueHolidays = holidays.filter((holiday, index, self) =>
+        index === self.findIndex(h => h.bs_day === holiday.bs_day && h.bs_month === holiday.bs_month && h.bs_year === holiday.bs_year)
+    );
+
+    // Render a loading message or the holiday list
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div>
-            <h1>Holidays</h1>
-            <ol>
-                {holidays.map(holiday => (
-                    <li key={holiday.id}>
-                        {holiday.bs_day}/{holiday.bs_month}/{holiday.bs_year} - {holiday.is_holiday ? "Holiday" : "Not a Holiday"}
+            <h2>Holiday List</h2>
+            <ul>
+                {uniqueHolidays.map((holiday, index) => (
+                    <li key={index}>
+                        {holiday.bs_day}/{holiday.bs_month}/{holiday.bs_year} - {holiday.events.map(event => event.event_en).join(', ')}
                     </li>
                 ))}
-            </ol>
+            </ul>
         </div>
     );
-};
+}
 
-export default Holidays;
+export default HolidayList;
