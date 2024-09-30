@@ -11,6 +11,8 @@ class Holiday(models.Model):
     bs_month_np = models.CharField(max_length=50)
 
     
+    class Meta:
+        unique_together = ['bs_day', 'bs_month', 'bs_year']
     def __str__(self):
         return f"{self.bs_day}/{self.bs_month}/{self.bs_year}"
 

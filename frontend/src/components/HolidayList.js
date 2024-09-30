@@ -28,7 +28,7 @@ function HolidayList() {
         index === self.findIndex(h => h.bs_day === holiday.bs_day && h.bs_month === holiday.bs_month && h.bs_year === holiday.bs_year)
     );
 
-    // Render a loading message or the holiday list
+    
     if (loading) {
         return <div>Loading...</div>;
     }

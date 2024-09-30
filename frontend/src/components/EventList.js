@@ -1,40 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-
-const Events = () => {
+function EventList() {
     const [events, setEvents] = useState([]);
-    
+    const [loading, setLoading] = useState(true);
+
+    const fetchEvents = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/events/');  // Check the correct API endpoint
+            if (!response.ok) {
+                throw new Error('Failed to fetch events');
+            }
+            const data = await response.json();
+            console.log('Fetched events:', data);  // Log fetched data to verify structure
+            setEvents(data);  // Update state with fetched events
+        } catch (error) {
+            console.error('Error fetching events:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const response = await fetch('http://127.0.0.1:8000/events/');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setEvents(data);
-            } catch (error) {
-                console.error('Error fetching events:', error);
-            }
-        };
-
         fetchEvents();
     }, []);
 
-    
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (events.length === 0) {
+        return <div>No events to display</div>;  // Message when there are no events
+    }
+
     return (
         <div>
-            <h1>Events:</h1>
-            <ol>
-                {events.filter(event=> event.is_holiday && event.event_np).map(event=>(
-                    <li key={event.id}>
-                        {event.event_np}/{event.event_en} - Event
+            <h2>Event List</h2>
+            <ul>
+                {events.map((event, index) => (
+                    <li key={index}>
+                        {event.event_en || 'Unknown'} ({event.event_np || 'Unknown'}) - {event.is_holiday ? 'Holiday' : 'Event'}
                     </li>
                 ))}
-            </ol>
+            </ul>
         </div>
     );
-};
+}
 
-export default Events;
+export default EventList;
