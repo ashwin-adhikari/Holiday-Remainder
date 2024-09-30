@@ -21,6 +21,10 @@ class Event(models.Model):
     event_np = models.CharField(max_length=255, null=True, blank=True)
     is_holiday = models.BooleanField(default=False)
     event_en = models.CharField(max_length=255, null=True, blank=True )
-
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['holiday', 'event_en', 'event_np'], name='unique_event_per_holiday')
+        ]
     def __str__(self):
         return self.event_en

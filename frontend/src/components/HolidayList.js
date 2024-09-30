@@ -39,7 +39,7 @@ function HolidayList() {
             <ul>
                 {uniqueHolidays.map((holiday, index) => (
                     <li key={index}>
-                        {holiday.bs_day}/{holiday.bs_month}/{holiday.bs_year} - {holiday.events.map(event => event.event_en).join(', ')}
+                        {holiday.bs_day}/{holiday.bs_month}/{holiday.bs_year} - {holiday.events.filter(event => event.event_en !== 'Unknown').map(event => event.event_en).join(', ')}
                     </li>
                 ))}
             </ul>

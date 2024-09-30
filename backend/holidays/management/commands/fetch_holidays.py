@@ -66,14 +66,17 @@ class Command(BaseCommand):
                     )
                     events = date_data.get("events", [])
                     for event in events:
-                        event_en = event.get("strEn", "Unknown")
-                        event_np = event.get("strNp", "Unknown")
-                        Event.objects.get_or_create(
-                            holiday=holiday,
-                            event_en=event_en,
-                            event_np=event_np,
-                            is_holiday=event["isHoliday"],
-                        )
+                        event_en = event.get("strEn", "").strip()
+                        event_np = event.get("strNp", "").strip()
+                        if event_en and event_np:
+                            Event.objects.get_or_create(
+                                holiday=holiday,
+                                event_en=event_en,
+                                event_np=event_np,
+                                is_holiday=event["isHoliday"],
+                            )
+                        else:
+                             print(f"Skipping event with missing details: {event}")
             self.stdout.write(
                 self.style.SUCCESS("Successfully fetched and stored holidays.")
             )

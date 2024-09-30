@@ -36,11 +36,14 @@ function EventList() {
         <div>
             <h2>Event List</h2>
             <ul>
-                {events.map((event, index) => (
-                    <li key={index}>
-                        {event.event_en || 'Unknown'} ({event.event_np || 'Unknown'}) - {event.is_holiday ? 'Holiday' : 'Event'}
-                    </li>
-                ))}
+                {events
+                    .filter(event => event.event_en && event.event_en !== 'Unknown') // Filter out unwanted events
+                    .map((event, index) => (
+                        <li key={index}>
+                            {event.event_en || 'Unknown'}
+                            ({event.event_np || 'Unknown'}) - {event.is_holiday ? 'Holiday' : 'Event'}
+                        </li>
+                    ))}
             </ul>
         </div>
     );
