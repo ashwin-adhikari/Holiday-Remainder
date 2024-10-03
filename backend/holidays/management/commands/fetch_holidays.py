@@ -1,4 +1,4 @@
-# holidays/management/commands/fetch_holidays.py
+
 
 import requests
 from django.core.management.base import BaseCommand
@@ -58,9 +58,10 @@ class Command(BaseCommand):
                         bs_day=date_data["bsDay"],
                         bs_month=date_data["bsMonth"],
                         bs_year=date_data["bsYear"],
+                        bs_month_en= date_data["bsMonthStrEn"],
+                        bs_month_np= date_data["bsMonthStrNp"],
                         defaults={
-                            "bs_month_en": date_data["bsMonthStrEn"],
-                            "bs_month_np": date_data["bsMonthStrNp"],
+                            
                             "is_holiday": is_holiday,
                         },
                     )
@@ -68,6 +69,8 @@ class Command(BaseCommand):
                     for event in events:
                         event_en = event.get("strEn", "").strip()
                         event_np = event.get("strNp", "").strip()
+                        events = Event.objects.filter(...).distinct('event_np', 'is_holiday')
+                        
                         if event_en and event_np:
                             Event.objects.get_or_create(
                                 holiday=holiday,
