@@ -1,4 +1,3 @@
-
 from django.urls import path
 from holidays.views import HolidayList,EventList
 
