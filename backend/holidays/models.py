@@ -14,6 +14,8 @@ class Holiday(models.Model):
     bs_month = models.IntegerField(default=1)
     bs_year = models.IntegerField(default=2080)
     bs_month_en = models.CharField(max_length=50)
+    weekday_En = models.CharField(max_length=50, default='unknown')
+    weekday_Np = models.CharField(max_length=60, default='unknown')
     is_holiday = models.BooleanField(default=False)
     bs_month_np = models.CharField(max_length=50)
     events = models.ManyToManyField(Event, related_name='holidays')

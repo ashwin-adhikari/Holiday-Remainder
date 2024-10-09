@@ -17,6 +17,8 @@ class Command(BaseCommand):
                 bsYear
                 bsMonthStrEn
                 bsMonthStrNp
+                weekdayStrEn
+                weekdayStrNp
                 isHoliday
                 events {
                     strNp
@@ -56,6 +58,8 @@ class Command(BaseCommand):
                             bs_year=date_data["bsYear"],
                             bs_month_en=date_data["bsMonthStrEn"],
                             bs_month_np=date_data["bsMonthStrNp"],
+                            weekday_En=date_data["weekdayStrEn"],
+                            weekday_Np=date_data["weekdayStrNp"],
                             defaults={"is_holiday": is_holiday},
                         )
 
@@ -66,6 +70,8 @@ class Command(BaseCommand):
                             "bsYear": date_data["bsYear"],
                             "bsMonthStrEn": date_data["bsMonthStrEn"],
                             "bsMonthStrNp": date_data["bsMonthStrNp"],
+                            "weekdayStrEn": date_data["weekdayStrEn"],
+                            "weekdayStrNp": date_data["weekdayStrNp"],
                             "events": [],
                         })
 

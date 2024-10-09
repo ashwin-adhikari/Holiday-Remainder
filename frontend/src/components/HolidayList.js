@@ -92,8 +92,8 @@ function HolidayList() {
               return (
                 <div key={index} className={`border rounded-lg p-4 shadow-md bg-gray-50 hover:bg-blue-100 hover:shadow-lg transition duration 300 transform hover:-translate-y-1 cursor-pointer" ${selectedHoliday === holiday ? 'bg-blue-100' : ''}`}
                   onClick={() => handleHolidayClick(holiday)}>
-                  <div className="font-bold text-xl mb-2">
-                    {holiday.bs_day}/{holiday.bs_month}/{holiday.bs_year}
+                  <div className="font-semi-bold text-xl mb-2 ">
+                    {holiday.weekday_En},  {holiday.bs_day}/{holiday.bs_month}/{holiday.bs_year}
                   </div>
                   
                   {selectedHoliday === holiday && (
