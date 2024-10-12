@@ -76,6 +76,14 @@ function HolidayList() {
   
   const nextHoliday = sortedHolidays.length > 0 ? sortedHolidays[0] : null;
 
+  const calculateDaysToHoliday = (holiday) => {
+    const holidayDate= new NepaliDate(holiday.bs_year, holiday.bs_month-1, holiday.bs_day);
+    const todayDate = new NepaliDate(currentBsYear,currentBsMonth-1,currentBsDay);
+    const timeDiff = holidayDate.getTime() - todayDate.getTime();
+    const dayDiff = timeDiff / (1000 * 3600 * 24);
+    return Math.ceil(dayDiff);
+  };
+
 
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -108,19 +116,27 @@ function HolidayList() {
       <div className="container mx-auto p-4 border rounded-lg p-4 bg-blue-100 mb-6 flex justify-between items-start">
         <div className="text-left">
         <h3 className="text-3xl font-bold mb-6">Todays Date:</h3>
-        <p className="text-2xl font-semibold mb-4 ">{formattedDate}</p></div>
-        <div className="text-right">
-        {nextHoliday && (
-          <div className="text-center">
-          <h3 className="text-3xl font-bold mb-6"> Next Holiday:</h3>
-          <p className="text-xl font-semibold mb-4">
-            {nextHoliday.weekday_En}, {nextHoliday.bs_day}/{nextHoliday.bs_month}/{nextHoliday.bs_year}</p></div>)}
+        <p className="text-2xl font-semibold mb-4 ">{formattedDate}</p>
         <button
           onClick={scrollToCurrentMonth}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
         >
           Current Month({monthNames[currentBsMonth - 1]})
         </button>
+        </div>
+
+        <div className="text-right">
+        {nextHoliday &&  (
+          <div className="text-center">
+          <h3 className="text-3xl font-bold mb-2"> Next Holiday:</h3>
+          <p className="text-xl font-semibold mb-4">
+            {nextHoliday.weekday_En}, {nextHoliday.bs_month_en} {nextHoliday.bs_day} {nextHoliday.event_en}
+            </p>
+            
+            <p className="text-lg font-semibold text-green-600 mt-6">
+               {calculateDaysToHoliday(nextHoliday)!== 0 ? "Next Holiday in:"+ calculateDaysToHoliday(nextHoliday)+" days.": "Today is Holiday."}  
+            </p>
+            </div>)}
         </div>
       </div>
 
@@ -155,17 +171,17 @@ function HolidayList() {
 
                       {selectedHoliday === holiday && (
                         <div className="text-gray-700  mt-2">
-                          <p className="font-semibold text-red-500">
+                          <p className="font-semibold text-gray-800">
                             Events on this day:
                           </p>
                           {holiday.events.length > 0 ? (
                             holiday.events
                               .filter((event) => event.event_en !== "Unknown")
                               .map((event, idx) => (
-                                <p key={idx}>{event.event_en}</p>
+                                <p key={idx} className="text-red-600">{event.event_en}</p>
                               ))
                           ) : (
-                            <p>No events for this holiday</p>
+                            <p className="text-green-600">No events for this holiday</p>
                           )}
                         </div>
                       )}
@@ -194,12 +210,12 @@ function HolidayList() {
                     holiday.events
                       .filter((event) => event.event_en !== "Unknown")
                       .map((event, idx) => (
-                        <p key={idx} className="text-gray-700">
+                        <p key={idx} className="text-red-600">
                           {event.event_en}
                         </p>
                       ))
                   ) : (
-                    <p className="text-gray-500">No events</p>
+                    <p className="text-green-600">No events</p>
                   )}
                 </div>
               </li>
