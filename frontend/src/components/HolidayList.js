@@ -55,8 +55,8 @@ function HolidayList() {
 
   // Group holidays by month
   const groupedHolidays = [...Array(12).keys()].reduce((acc, i) => {
-    const month = i+1;
-    acc[month]= holidays.filter((holiday) => holiday.bs_month === month);
+    const month = i + 1;
+    acc[month] = holidays.filter((holiday) => holiday.bs_month === month);
     return acc;
   }, {});
 
@@ -73,17 +73,24 @@ function HolidayList() {
       monthRefs.current[currentBsMonth].scrollIntoView({ behavior: "smooth" });
     }
   };
-  
+
   const nextHoliday = sortedHolidays.length > 0 ? sortedHolidays[0] : null;
 
   const calculateDaysToHoliday = (holiday) => {
-    const holidayDate= new NepaliDate(holiday.bs_year, holiday.bs_month-1, holiday.bs_day);
-    const todayDate = new NepaliDate(currentBsYear,currentBsMonth-1,currentBsDay);
+    const holidayDate = new NepaliDate(
+      holiday.bs_year,
+      holiday.bs_month - 1,
+      holiday.bs_day
+    );
+    const todayDate = new NepaliDate(
+      currentBsYear,
+      currentBsMonth - 1,
+      currentBsDay
+    );
     const timeDiff = holidayDate.getTime() - todayDate.getTime();
     const dayDiff = timeDiff / (1000 * 3600 * 24);
     return Math.ceil(dayDiff);
   };
-
 
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -115,28 +122,44 @@ function HolidayList() {
 
       <div className="container mx-auto p-4 border rounded-lg p-4 bg-blue-100 mb-6 flex justify-between items-start">
         <div className="text-left">
-        <h3 className="text-3xl font-bold mb-6">Todays Date:</h3>
-        <p className="text-2xl font-semibold mb-4 ">{formattedDate}</p>
-        <button
-          onClick={scrollToCurrentMonth}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-        >
-          Current Month({monthNames[currentBsMonth - 1]})
-        </button>
+          <h3 className="text-3xl font-bold mb-6">Todays Date:</h3>
+          <p className="text-2xl font-semibold mb-4 ">{formattedDate}</p>
+          <button
+            onClick={scrollToCurrentMonth}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+          >
+            Current Month({monthNames[currentBsMonth - 1]})
+          </button>
         </div>
 
         <div className="text-right">
-        {nextHoliday &&  (
-          <div className="text-center">
-          <h3 className="text-3xl font-bold mb-2"> Next Holiday:</h3>
-          <p className="text-xl font-semibold mb-4">
-            {nextHoliday.weekday_En}, {nextHoliday.bs_month_en} {nextHoliday.bs_day} {nextHoliday.event_en}
-            </p>
-            
-            <p className="text-lg font-semibold text-green-600 mt-6">
-               {calculateDaysToHoliday(nextHoliday)!== 0 ? "Next Holiday in:"+ calculateDaysToHoliday(nextHoliday)+" days.": "Today is Holiday."}  
-            </p>
-            </div>)}
+          {nextHoliday && (
+            <div className="text-left">
+              <p className="text-3xl font-bold mb-2">
+                {" "}
+                Next Holiday:
+                {calculateDaysToHoliday(nextHoliday) !== 0
+                  ? "Next Holiday in:" +
+                    calculateDaysToHoliday(nextHoliday) +
+                    " days."
+                  : " "}
+              </p>
+              <p className="text-xl font-semibold ">
+                {nextHoliday.weekday_En}, {nextHoliday.bs_month_en}{" "}
+                {nextHoliday.bs_day} {nextHoliday.event_en}
+              </p>
+
+              {nextHoliday.events.length > 0 ? (
+                nextHoliday.events.map((event, idx) => (
+                  <p key={idx} className="text-red-600 ">
+                    {event.event_en}
+                  </p>
+                ))
+              ) : (
+                <p className="text-green-600">No events for this holiday</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -178,10 +201,14 @@ function HolidayList() {
                             holiday.events
                               .filter((event) => event.event_en !== "Unknown")
                               .map((event, idx) => (
-                                <p key={idx} className="text-red-600">{event.event_en}</p>
+                                <p key={idx} className="text-red-600">
+                                  {event.event_en}
+                                </p>
                               ))
                           ) : (
-                            <p className="text-green-600">No events for this holiday</p>
+                            <p className="text-green-600">
+                              No events for this holiday
+                            </p>
                           )}
                         </div>
                       )}
@@ -202,8 +229,15 @@ function HolidayList() {
                 className="p-4 border rounded-lg shadow bg-blue-50 "
               >
                 <div className="font-semibold">
-                 {holiday.bs_day != currentBsDay ? holiday.weekday_En +"," +holiday.bs_day+"/"+holiday.bs_month+"/"+
-                  holiday.bs_year : "Today"}
+                  {holiday.bs_day !== currentBsDay
+                    ? holiday.weekday_En +
+                      "," +
+                      holiday.bs_day +
+                      "/" +
+                      holiday.bs_month +
+                      "/" +
+                      holiday.bs_year
+                    : "Today"}
                 </div>
                 <div>
                   {holiday.events.length > 0 ? (
