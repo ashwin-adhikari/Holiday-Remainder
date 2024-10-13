@@ -202,8 +202,8 @@ function HolidayList() {
                 className="p-4 border rounded-lg shadow bg-blue-50 "
               >
                 <div className="font-semibold">
-                  {holiday.weekday_En}, {holiday.bs_day}/{holiday.bs_month}/
-                  {holiday.bs_year}
+                 {holiday.bs_day==calculateDaysToHoliday.todayDate? holiday.weekday_En +"," +holiday.bs_day+"/"+holiday.bs_month+"/"+
+                  holiday.bs_year : "Today"}
                 </div>
                 <div>
                   {holiday.events.length > 0 ? (
