@@ -137,9 +137,9 @@ function HolidayList() {
             <div className="text-left">
               <p className="text-3xl font-bold mb-2">
                 {" "}
-                Next Holiday:
+                Next Holiday
                 {calculateDaysToHoliday(nextHoliday) !== 0
-                  ? "Next Holiday in:" +
+                  ? " in: " +
                     calculateDaysToHoliday(nextHoliday) +
                     " days."
                   : " "}
