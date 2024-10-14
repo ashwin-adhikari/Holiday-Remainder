@@ -6,7 +6,7 @@ const App = () => {
     return (
         <div>
             <HolidayList />
-            <EventList />
+            {/* <EventList /> */}
         </div>
     );
 };
