@@ -1,21 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import NepaliDate from "nepali-date";
 import Popup from "./Popup";
 
 function HolidayList() {
   const [holidays, setHolidays] = useState([]);
+  const [currentYearHolidays, setCurrentYearHolidays] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedHoliday,setSelectedHoliday] = useState()
+  const [selectedHoliday, setSelectedHoliday] = useState()
   const [searchedHolidays, setSearchedHolidays] = useState([])
   const [showPopup, setShowPopup] = useState(false);
+  const [selectedYear, setSelectedYear] = useState(new NepaliDate().getYear());
 
   const monthRefs = useRef({});
   // Function to fetch holiday data from the backend
   const fetchHolidays = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/holidays/");
+      const response = await fetch(`http://127.0.0.1:8000/holidays/?year=${selectedYear}`);
       const data = await response.json();
-      setHolidays(data); // Update holidays state
+      return data; // Update holidays state
     } catch (error) {
       console.error("Error fetching holidays:", error);
     } finally {
@@ -23,10 +25,25 @@ function HolidayList() {
     }
   };
 
-  // Use useEffect to fetch holidays when the component mounts
+  // Use effect to fetch holidays when the component mounts
   useEffect(() => {
-    fetchHolidays();
-  }, []);
+    const fetchCurrentYearHolidays = async () => {
+        const currentYearData = await fetchHolidays(new NepaliDate().getYear());
+        setCurrentYearHolidays(currentYearData); // Set holidays for the current year
+    };
+
+    fetchCurrentYearHolidays(); // Fetch current year holidays initially
+}, []);
+
+// Use effect to fetch holidays for selected year
+useEffect(() => {
+    const fetchSelectedYearHolidays = async () => {
+        const selectedYearData = await fetchHolidays(selectedYear);
+        setHolidays(selectedYearData); // Update holidays state for selected year
+    };
+
+    fetchSelectedYearHolidays(); // Fetch holidays for selected year
+}, [selectedYear]);
 
   const today = new NepaliDate();
   const formattedDate = today.format("dddd,MMMM d,YYYY");
@@ -34,8 +51,8 @@ function HolidayList() {
   const currentBsYear = today.getYear();
   const currentBsDay = today.getDate();
 
-  // Filter out holidays that are in the past
-  const filterUpcomingHolidays = holidays.filter((holiday) => {
+  // Filter out holidays that are in the past for selected year
+  const filterUpcomingHolidays = currentYearHolidays.filter((holiday) => {
     if (holiday.bs_year > currentBsYear) {
       return true; // Future year
     } else if (holiday.bs_year === currentBsYear) {
@@ -63,19 +80,9 @@ function HolidayList() {
     return acc;
   }, {});
 
-  const handleHolidayClick = (holiday) => {
-    if (selectedHoliday === holiday) {
-      setSelectedHoliday(null);
-    } else {
-      setSelectedHoliday(holiday);
-    }
-  };
-
-  const scrollToCurrentMonth = () => {
-    if (monthRefs.current[currentBsMonth]) {
-      monthRefs.current[currentBsMonth].scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  const handleHolidayClick = useCallback((holiday) => {
+    setSelectedHoliday(selectedHoliday === holiday ? null : holiday);
+    }, [selectedHoliday]);
 
   const nextHoliday = sortedHolidays.length > 0 ? sortedHolidays[0] : null;
 
@@ -97,7 +104,7 @@ function HolidayList() {
 
   const searchMonth = () => {
     const monthName = document.querySelector("input").value.trim().toLowerCase();
-    const monthIndex = monthNames.findIndex((name) => name.toLowerCase()===monthName)
+    const monthIndex = monthNames.findIndex((name) => name.toLowerCase() === monthName)
     if (monthIndex === -1) {
       alert("Month not found");
       return;
@@ -114,6 +121,19 @@ function HolidayList() {
     setShowPopup(false);
     setSearchedHolidays([]); // Reset selected holiday when closing
   };
+
+  const generateYearOptions = () => {
+    const currentYear = new NepaliDate().getYear();
+    return Array.from({ length: 96 }, (_, i) => currentYear - 80 + i); // Generate years from current - 80 to current + 15
+    
+  };
+
+  const handleYearChange = (event) => {
+   setSelectedYear(Number(event.target.value));
+  };
+  const resetToCurrentYear = () => {
+    setSelectedYear(new NepaliDate().getYear());
+};
 
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -147,13 +167,30 @@ function HolidayList() {
         <div className="text-left">
           <h3 className="text-3xl font-bold mb-6">Todays Date:</h3>
           <p className="text-2xl font-semibold mb-4 ">{formattedDate}</p>
-          <button
-            onClick={scrollToCurrentMonth}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-          >
-            Current Month({monthNames[currentBsMonth - 1]})
-          </button>
+          <div className="text-right">
+            {/* Year Selection Dropdown */}
+            <div className="text-left">
+              <label htmlFor="yearSelect" className="text-xl">Select Year: </label>
+              <select
+                id="yearSelect"
+                value={selectedYear}
+                onChange={handleYearChange}
+                className="p-2 border rounded"
+                style={{ maxHeight: "200px", overflowY: "auto" }} // Make dropdown scrollable
+              >
+                {generateYearOptions().map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+              <button onClick={resetToCurrentYear} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2">
+                           Current Year
+              </button>
+            </div>
+          </div>
         </div>
+
 
         <div className="text-right">
           {nextHoliday && (
@@ -172,7 +209,7 @@ function HolidayList() {
                 {nextHoliday.bs_day} {nextHoliday.event_en}
               </p>
 
-              {nextHoliday.events.length > 0 ? (
+              {Array.isArray(nextHoliday.events) && nextHoliday.events.length > 0 ? (
                 nextHoliday.events.map((event, idx) => (
                   <p key={idx} className="text-red-600 ">
                     {event.event_en}
@@ -190,11 +227,11 @@ function HolidayList() {
             </button>
           </div>
           {showPopup && searchedHolidays.length > 0 && (
-                <Popup holidays={searchedHolidays} onClose={handleClosePopup} />
-            )}
+            <Popup holidays={searchedHolidays} onClose={handleClosePopup} />
+          )}
         </div>
       </div>
-
+      {/* Holiday for each months*/}
       <div className="flex flex-row">
         <div className="w-full md:w-2/3">
           {Object.keys(groupedHolidays).map((month) => (

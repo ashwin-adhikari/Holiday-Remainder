@@ -7,12 +7,20 @@ from holidays.models import Holiday, Event
 class Command(BaseCommand):
     help = "Fetch and store holiday data from API"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--year',
+            type=int,
+            default=2081,
+            help='The Nepali year for which to fetch holidays (e.g., 2081)', 
+        )
 
     def handle(self, *args, **kwargs):
+        year = kwargs['year']
         api_url = "https://api.saralpatro.com/graphql"
-        query = """
-        query {
-            dates(bsYear: 2081) {
+        query = f"""
+        query {{
+            dates(bsYear: {year}) {{
                 bsDay
                 bsMonth
                 bsYear
@@ -21,13 +29,13 @@ class Command(BaseCommand):
                 weekdayStrEn
                 weekdayStrNp
                 isHoliday
-                events {
+                events {{ 
                     strNp
                     strEn
                     isHoliday
-                }
-            }
-        }
+                    }}
+            }}
+        }}
         """
 
         try:
