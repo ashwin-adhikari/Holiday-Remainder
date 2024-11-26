@@ -7,6 +7,7 @@ from holidays.models import Holiday, Event
 class Command(BaseCommand):
     help = "Fetch and store holiday data from API"
 
+
     def handle(self, *args, **kwargs):
         api_url = "https://api.saralpatro.com/graphql"
         query = """

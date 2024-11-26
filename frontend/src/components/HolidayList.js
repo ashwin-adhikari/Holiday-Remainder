@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import NepaliDate from "nepali-date";
+import Popup from "./Popup";
 
 function HolidayList() {
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedHoliday, setSelectedHoliday] = useState(null);
+  const [selectedHoliday,setSelectedHoliday] = useState()
+  const [searchedHolidays, setSearchedHolidays] = useState([])
+  const [showPopup, setShowPopup] = useState(false);
 
   const monthRefs = useRef({});
   // Function to fetch holiday data from the backend
@@ -92,6 +95,26 @@ function HolidayList() {
     return Math.ceil(dayDiff);
   };
 
+  const searchMonth = () => {
+    const monthName = document.querySelector("input").value.trim().toLowerCase();
+    const monthIndex = monthNames.findIndex((name) => name.toLowerCase()===monthName)
+    if (monthIndex === -1) {
+      alert("Month not found");
+      return;
+    }
+    const holidaysForMonth = holidays.filter(holiday => holiday.bs_month === (monthIndex + 1));
+    if (holidaysForMonth.length > 0) {
+      setSearchedHolidays(holidaysForMonth);
+      setShowPopup(true); // Show popup when there are results
+    } else {
+      alert("No holidays found for this month");
+    }
+  };
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    setSearchedHolidays([]); // Reset selected holiday when closing
+  };
+
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
   }
@@ -109,7 +132,7 @@ function HolidayList() {
     "Bhadra",
     "Ashwin",
     "Kartik",
-    "Mangshir",
+    "Mangsir",
     "Poush",
     "Magh",
     "Falgun",
@@ -140,8 +163,8 @@ function HolidayList() {
                 Next Holiday
                 {calculateDaysToHoliday(nextHoliday) !== 0
                   ? " in: " +
-                    calculateDaysToHoliday(nextHoliday) +
-                    " days."
+                  calculateDaysToHoliday(nextHoliday) +
+                  " days."
                   : " "}
               </p>
               <p className="text-xl font-semibold ">
@@ -160,6 +183,15 @@ function HolidayList() {
               )}
             </div>
           )}
+          <div className="mt-4 text-left">
+            <input id="input" type="text" placeholder="Baisakh" className="p-2" />
+            <button onClick={searchMonth} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
+              Search
+            </button>
+          </div>
+          {showPopup && searchedHolidays.length > 0 && (
+                <Popup holidays={searchedHolidays} onClose={handleClosePopup} />
+            )}
         </div>
       </div>
 
@@ -182,9 +214,8 @@ function HolidayList() {
                   return (
                     <div
                       key={index}
-                      className={`border rounded-lg p-4 shadow-md bg-gray-50 hover:bg-blue-100 hover:shadow-lg transition duration 300 transform hover:-translate-y-1 cursor-pointer" ${
-                        selectedHoliday === holiday ? "bg-blue-100" : ""
-                      }`}
+                      className={`border rounded-lg p-4 shadow-md bg-gray-50 hover:bg-blue-100 hover:shadow-lg transition duration 300 transform hover:-translate-y-1 cursor-pointer" ${selectedHoliday === holiday ? "bg-blue-100" : ""
+                        }`}
                       onClick={() => handleHolidayClick(holiday)}
                     >
                       <div className="font-semi-bold text-xl mb-2 ">
@@ -201,7 +232,7 @@ function HolidayList() {
                             holiday.events
                               .filter((event) => event.event_en !== "Unknown")
                               .map((event, idx) => (
-                                <p key={idx} className="text-red-600">
+                                <p key={idx} className="text-red-600 mb-2">
                                   {event.event_en}
                                 </p>
                               ))
@@ -231,12 +262,12 @@ function HolidayList() {
                 <div className="font-semibold">
                   {holiday.bs_day !== currentBsDay
                     ? holiday.weekday_En +
-                      "," +
-                      holiday.bs_day +
-                      "/" +
-                      holiday.bs_month +
-                      "/" +
-                      holiday.bs_year
+                    "," +
+                    holiday.bs_day +
+                    "/" +
+                    holiday.bs_month +
+                    "/" +
+                    holiday.bs_year
                     : "Today"}
                 </div>
                 <div>
